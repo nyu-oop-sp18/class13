@@ -39,7 +39,7 @@ console.log(person1.age);  // undefined
 ```
 
 
-### Dynamically typed
+### Dynamic Typing
 
 In JavaScript, *values* are typed, not *expressions*.
 
@@ -477,7 +477,92 @@ class Person implements NamedVal {
 
 ### Union and Intersection types
 
+Suppose you have a function that expects either a number or a string:
+
+```typescript
+/**
+ * Takes a string and adds "padding" to the left.
+ * If 'padding' is a string, then 'padding' is appended to the left side.
+ * If 'padding' is a number, then that number of spaces is added to the left side.
+ */
+function padLeft(value: string, padding: any) {
+    if (typeof padding === "number") {
+        return Array(padding + 1).join(" ") + value;
+    }
+    if (typeof padding === "string") {
+        return padding + value;
+    }
+    throw new Error(`Expected string or number, got '${padding}'.`);
+}
+
+padLeft("Hello world", 4); // returns "    Hello world"
+```
+
+The problem with using the type `any` for `padding` is that TS will not warn you when you execute something like `padLeft("sss", false)`.
+In standard OO languages, we can add an appropriate class in the type hierarchy and use that as the type for `padding`, however this is both an overkill (you cannot do this for every such function), and is also bad for performance as you would have to "box" the primitive types `string` and `number` inside classes.
+We can instead use a *union type*:
+
+```typescript
+function padLeft(value: string, padding: string | number) {
+    // ...
+}
+
+let indentedString = padLeft("Hello world", true);  // Error
+```
+
+
 ### Generics
+
+How would you type the generic identity function?
+Here is a first attempt:
+
+```typescript
+function identity(arg: any): any {
+  return arg;
+}
+
+var x = 5;
+var y = identity(x) + 1.3;  // y has type any
+```
+
+The problem here is that we have lost some type information.
+We do not know that since `x` has type `number`, so does `identity(x)`.
+
+TS allows you to use *type variables* to describe the types of generic functions:
+
+```typescript
+function identity<T>(arg: T): T {
+  return arg;
+}
+
+var x = 5;
+var y = identity(x) + 1.3;  // y has type number
+```
+
+Of course, inside a generic function, you cannot assume anything about the generic type `T`:
+
+```typescript
+function loggingIdentity<T>(arg: T): T {
+    console.log(arg.length);  // Error: T doesn't have .length
+    return arg;
+}
+```
+
+If we do want to impose such a constraint on `T`, we can use an interface:
+
+```typescript
+interface Lengthwise {
+    length: number;
+}
+
+function loggingIdentity<T extends Lengthwise>(arg: T): T {
+    console.log(arg.length);  // Now we know it has a .length property, so OK
+    return arg;
+}
+
+loggingIdentity(3);  // Error, number doesn't have a .length property
+```
+
 
 ### Unsoundness
 
