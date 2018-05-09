@@ -1,20 +1,23 @@
 # Class 13
 
+
 ## JavaScript
 
-TODO: add intro
-Dynamic language: JS
+Javascript is a dynamic, weakly typed, prototype-based, multi-paradigm, high-level, interpreted programming language.
+It is basically the language that the internet is built on. 
+It has some features ("JavaScript is ridiculously liberal in what it allows" according to [Marijn Haverbeke](https://eloquentjavascript.net/00_intro.html)) that might be of interest after a semester of looking at Scala.
+
 
 ### Imperative
 
-Like C/Java
+JavaScript is an imperative langauge that borrows most of its syntax from Java, and should be familiar to anyone who has coded in C/C++.
 
 
 ### Objects
 
-JS is based on *objects* - collection of name-value pairs.
-Names are strings, and values can be any JS value, including other objects.
-Pretty much everything, apart from some primitive values such as numbers, strings, and booleans, is an object in JS.
+JavaScript is based on *objects* - collection of name-value pairs.
+Names are strings, and values can be any JavaScript value, including other objects.
+Pretty much everything, apart from some primitive values such as numbers, strings, and booleans, is an object in JavaScript.
 
 ```javascript
 // Creating an object
@@ -45,7 +48,7 @@ console.log(person1.age);  // undefined
 In JavaScript, *values* are typed, not *expressions*.
 
 This means that at compile time, one cannot tell the type of a variable or a source expression.
-How does JS know whether a function can be applied on a value?
+How does JavaScript know whether a function can be applied on a value?
 It checks the type of the value at run-time.
 
 This allows us to write code like this:
@@ -123,7 +126,7 @@ In the code above, the call `dunk(hen)` is allowed even though `hen` does not ha
 
 ### Classes?
 
-JS does not organize objects using classes.
+JavaScript does not organize objects using classes.
 If you want to have a uniform way of creating a whole bunch of objects to represent people, you would use a function to create person objects (a kind of a person factory):
 
 ```javascript
@@ -145,7 +148,7 @@ console.log(p1.fullName());  // Dodo Baggins
 The `this` keyword, used inside a funciton, refers to the current object.
 Since in the final line `fullName` is called as `p1.fullName()`, `p1` is the current object.
 
-JS gives you a simpler, and more familiar, way of creating object factories:
+JavaScript gives you a simpler, and more familiar, way of creating object factories:
 
 ```javascript
 function Person(first, last) {
@@ -165,16 +168,16 @@ Notice that the `Person` function does not return anything -- it is `new` that r
 
 ### Prototypes
 
-JS uses *prototypes* as a way to model inheritance and other relations between classes.
+JavaScript uses *prototypes* as a way to model inheritance and other relations between classes.
 Every object has a prototype, which is a reference to another object (or `null`).
 For example, if you create a new object
 ```javascript
 var o = { foo: "123" };
 ```
-then JS automatically sets the prototype of `o` to `Object.prototype`.
+then JavaScript automatically sets the prototype of `o` to `Object.prototype`.
 What is the prototype of `Object.prototype`, you may ask? `null`.
 
-Every time we access a property of an object, `o.p`, JS will first look for `p` in `o`, and failing that, will look in the prototype of `o`, and then the prototype of the prototype of `o`, and so on.
+Every time we access a property of an object, `o.p`, JavaScript will first look for `p` in `o`, and failing that, will look in the prototype of `o`, and then the prototype of the prototype of `o`, and so on.
 This is called the *prototype chain*, and the search for `p` ends when the prototype of some object is `null`.
 
 
@@ -199,7 +202,7 @@ console.log(p2.fullName());  // Grand Elf
 ```
 
 `Person.prototype` is an object that is shared by all instances of `Person`.
-When you use the syntax `var o = new Person(...)` to create an object, JS automatically sets the prototype of `o` to `Person.prototype`.
+When you use the syntax `var o = new Person(...)` to create an object, JavaScript automatically sets the prototype of `o` to `Person.prototype`.
 
 In the example above, the prototype chains for `p1` and `p2` look like this:
 ```
@@ -214,7 +217,7 @@ One can, for instance, model classes quite easily using prototypes, as we see be
 
 ### Inheritance
 
-The simplest way to implement inheritance in JS is to link the prototype of an object of the subtype to the object of a supertype.
+The simplest way to implement inheritance in JavaScript is to link the prototype of an object of the subtype to the object of a supertype.
 
 ```javascript
 var a = {
@@ -277,7 +280,7 @@ In this case, the prototype chain for `b` looks like:
 b ---> B.prototype ---> A.prototype ---> Object.prototype ---> null
 ```
 
-Newer versions of JS give you a more familiar `class` syntax to do the same thing:
+Newer versions of JavaScript give you a more familiar `class` syntax to do the same thing:
 
 ```javascript
 class A {
@@ -308,8 +311,8 @@ console.log(b.toString());  // b
 console.log(b.size);  // 12
 ```
 
-Note that there is the inheritance hierarchy is not static in JS.
-In fact, in some implementations of JS, you can modify the prototype chain of an object on-the-fly!
+Note that there is the inheritance hierarchy is not static in JavaScript.
+In fact, in some implementations of JavaScript, you can modify the prototype chain of an object on-the-fly!
 
 ```javascript
 class A {
@@ -374,53 +377,121 @@ a.foo();  // Do something harmful and malicious.
 
 ### More about Methods
 
-Methods are nothing more than properties that hold function values.
-
+Methods are nothing more than properties of objects that hold function values (recall, functions are objects too).
 JavaScript, being dynamically typed, has no concept of method signatures.
-This means there is no method overloading; in fact, there can only be one function of a given name in an object.
+This means there is no method overloading; in fact, since object properties are identified by their names, there can only be one method of a given name in an object.
+
 However, a method in one object can be overridden by a definition of a method of the same name in an object further down the prototype chain, as done for the `toString` function above.
-This also means that there is no extra support needed for dynamic dispatch.
-In JS, this is simply a consequence of the prototype chain and dynamic duck/structural typing.
+As we will see below, a consequence of the prototype chain and dynamic duck/structural typing is that there is no extra support needed for dynamic dispatch.
+
 
 
 Remember this Scala example?
 
 ```scala
-class A(val x: Int) {
-  def m(): Int = x
-}
-class B(x0: Int, val y: Int) extends A(x0) {
-  override def m(): Int = x + y
+class A(val x: Int, val y: Int) { 
+  def m1() = { ... }
+  def m2() = { ... }
 }
 
-def f(a: A) = a.m()
-
-val a: A = new B(1, 2)
-a.m()  // 3
+class B(x1: Int, y1: Int, val z: Int) extends A(x1, y1) {
+  override def m2() = { /* overriding A.m2 */ ... }
+  def m3() = { ... }
+}
 ```
 
-In JavaScript, this looks like:
+Scala implements these using vtables and vpointers as follows:
+
+```
+      A Instance:                A vtable:
+    0┌─────────────┐        ┌> 0┌────────────┐                    ┌─────────────┐
+     │ vptr        │────────┘   │ ptr. to m1 │───────────────────>│impl. of A.m1│
+    8├─────────────┤           8├────────────┤                    └─────────────┘
+     │ value of x  │            │ ptr. to m2 │────────┐  ┌─────────────┐   ^
+   12├─────────────┤            └────────────┘        └─>│impl. of A.m2│   │
+     │ value of y  │                                     └─────────────┘   │
+     └─────────────┘                                                       │
+                                                                           │
+      B Instance:                B vtable:                                 │
+    0┌─────────────┐        ┌> 0┌────────────┐                             │
+     │ vptr        │────────┘   │ ptr. to m1 │─────────────────────────────┘ 
+    8├─────────────┤           8├────────────┤           ┌─────────────┐
+     │ value of x  │            │ ptr. to m2 │──────────>│impl. of B.m2│
+   12├─────────────┤          16├════════════┤           └─────────────┘ 
+     │ value of y  │            │ ptr. to m3 │────────┐  ┌─────────────┐
+   16├═════════════┤            └────────────┘        └─>│impl. of B.m3│
+     │ value of z  │                                     └─────────────┘
+     └─────────────┘
+```
+
+However, we cannot implement method lookup using optimizations such as using offsets or vtables in JavaScript.
+Why not?
+Because in JavaScript, properties of objects can be referenced using string values, including statically-unknown values:
+
 ```javascript
-class A {
-  constructor(x) {
-    this.x = x;
-  }
-  
-  m () { return this.x; }
+var o = {
+  foo: 1,
+  bar: 2,
 }
 
-class B extends A {
-  constructor (x, y) {
-    super(x);
-    this.y = y;
-  }
-  
-  m () { return this.x + this.y; }
+if (Math.random() < 0.5)
+  str = "foo";
+else
+  str = "bar";
+
+console.log(o[str]);  // Is this accessing o.foo or o.bar?!
+``` 
+
+Thus there is no way to calculate offsets for different properties.
+Of course, another reason is the fact that there are no classes, so for every object in your program you'd potentially need a separate offset table!
+
+However, in JavaScript, you don't really need to do all this, because the prototype model allows you to write programs that have similar lookup costs.
+In JavaScript, our example looks like (not using the class syntax for clarity):
+
+```javascript
+function A(x, y) {
+  this.x = x;
+  this.y = y;
 }
 
-var b = new B(1, 2);
-console.log(b.m());  // 3
+A.prototype.m1 = function() { };
+A.prototype.m2 = function() { };
+
+function B(x, y, z) {
+  A.call(this, x, y);
+  this.z = z;
+}
+
+B.prototype.m2 = function() { };  // overriding A.m2
+B.prototype.m3 = function() { };
 ```
+
+And the underlying implementation looks like (some JavaScript engines use more [complex implementations](https://github.com/v8/v8/wiki/Design%20Elements) for performance reasons):
+
+```
+ A instance:              A.prototype:         +---> Object.prototype
++---------------+        +---------------+     |
+| [[Prototype]] +--+---> | [[Prototype]] +-----+
++---------------+  |     +---------------+           +---------------+
+| x             |  |     | m1            +---------> | impl. of A.m1 |
++---------------+  |     +---------------+           +---------------+
+| y             |  |     | m2            +-----+
++---------------+  |     +---------------+     |     +---------------+
+                   |                           +---> | impl. of A.m2 |
+                   +-------------------------+       +---------------+
+                                             |
+ B instance:              B.prototype        |
++---------------+        +---------------+   |
+| [[Prototype]] +------> | [[Prototype]] +---+
++---------------+        +---------------+           +---------------+
+| x             |        | m2            +---------> | impl. of B.m2 |
++---------------+        +---------------+           +---------------+
+| y             |        | m3            +-----+
++---------------+        +---------------+     |     +---------------+
+| z             |                              +---> | impl. of B.m3 |
++---------------+                                    +---------------+
+```
+
 
 ### Functional Programming
 
@@ -460,31 +531,31 @@ For more streamlined support for functional programming, take a look at the [Ram
 
 ## TypeScript
 
-TypeScript is an attempt to tame the JS jungle using static typing.
-It is essentially a *strict superset* of JS: any valid JS code is valid TS code.
-TS adds syntax that allows the developer to annotate the code with the types of various expressions.
+TypeScript is an attempt to tame the JavaScript jungle using static typing.
+It is essentially a *strict superset* of JavaScript: any valid JavaScript code is valid TypeScript code.
+TypeScript adds syntax that allows the developer to annotate the code with the types of various expressions.
 
-To make it easier for developers to port existing JS codebases, (a) TS allows you to specify the types of certain variables to be `any`, and (b) even if TS finds some static type errors, it still emits JS.
-The first property will be more clear when we look at the type system of TS.
+To make it easier for developers to port existing JavaScript codebases, (a) TypeScript allows you to specify the types of certain variables to be `any`, and (b) even if TypeScript finds some static type errors, it still emits JavaScript.
+The first property will be more clear when we look at the type system of TypeScript.
 
 ### TypeScript's (optional) types
 
-TS has the same basic types as JS: `number`, `boolean`, and `string`.
-TS can automatically infer the types of certain expressions and warns you when you assign a variable a value of a different type.
+TypeScript has the same basic types as JavaScript: `number`, `boolean`, and `string`.
+TypeScript can automatically infer the types of certain expressions and warns you when you assign a variable a value of a different type.
 
 ```typescript
 var x = 5;
 x = "str";  // Error: Type '"asdf"' is not assignable to type 'number'.
 ```
 
-You can also manually annotate a variable with a type, in which case TS will prevent you from using it in contexts where another type is expected.
+You can also manually annotate a variable with a type, in which case TypeScript will prevent you from using it in contexts where another type is expected.
 ```typescript
 var y: string;
 var z = y * 1.5;  // Error: The left-hand side of an arithmetic operation must be of type 'any', 'number' or an enum type.
 ```
 
 You can opt-out of type checking by marking an expression with the `any` type.
-This is useful for the intermediate states in migrating a JS program, or when using a 3rd party library that is not yet typed.
+This is useful for the intermediate states in migrating a JavaScript program, or when using a 3rd party library that is not yet typed.
 ```typescript
 var y: any;
 var z = y * 1.5;  // OK
@@ -500,8 +571,8 @@ x = y;  // OK
 
 ### Interfaces
 
-TS can also reason about the duck-typing or structural subtyping done by JS.
-To do this, TS gives you *interfaces*, which are types that describe objects.
+TypeScript can also reason about the duck-typing or structural subtyping done by JavaScript.
+To do this, TypeScript gives you *interfaces*, which are types that describe objects.
 For example:
 
 ```typescript
@@ -582,7 +653,7 @@ function padLeft(value: string, padding: any) {
 padLeft("Hello world", 4); // returns "    Hello world"
 ```
 
-The problem with using the type `any` for `padding` is that TS will not warn you when you execute something like `padLeft("sss", false)`.
+The problem with using the type `any` for `padding` is that TypeScript will not warn you when you execute something like `padLeft("sss", false)`.
 In standard OO languages, we can add an appropriate class in the type hierarchy and use that as the type for `padding`, however this is both an overkill (you cannot do this for every such function), and is also bad for performance as you would have to "box" the primitive types `string` and `number` inside classes.
 We can instead use a *union type*:
 
@@ -611,7 +682,7 @@ var y = identity(x) + 1.3;  // y has type any
 The problem here is that we have lost some type information.
 We do not know that since `x` has type `number`, so does `identity(x)`.
 
-TS allows you to use *type variables* to describe the types of generic functions:
+TypeScript allows you to use *type variables* to describe the types of generic functions:
 
 ```typescript
 function identity<T>(arg: T): T {
@@ -684,6 +755,8 @@ cats.forEach(cat => cat.purr());
 JavaScript:
 
 - [Eloquent JavaScript](https://eloquentjavascript.net/): a free online book
+
+- [You Don't Know JS](https://github.com/getify/You-Dont-Know-JS): free online book series
 
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/A_re-introduction_to_JavaScript
 
