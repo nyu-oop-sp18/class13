@@ -2,6 +2,7 @@
 
 ## JavaScript
 
+TODO: add intro
 Dynamic language: JS
 
 ### Imperative
@@ -62,13 +63,30 @@ console.log(x + 'o');  // hello
 Why would we want to do that?
 Static vs dynamic languages is one of the cat-vs-dogs style controversies that will probably never be settled.
 You can spend hours reading the opinions of both sides on the internet.
-Here are some common reasons people give for preferring dynamic languages (warning: these do not necessarily reflect the views of the instructor, nor are they a recommendation):
+Here are some common reasons people give for preferring dynamic languages:
 
-- Quicker to hack together small programs.
+- Quicker to hack together small programs: you can write more succinct code (for example see function `padLeft` below), and you don't have to wait for your code to compile/type-check.
 
 - Less boilerplate: you do not need to write class definitions and type annotations.
 
 - Better polymorphism: for example, [abstractions in Clojure](http://www.infoq.com/presentations/Clojure-The-Art-of-Abstraction).
+
+On the other hand, here are some reasons for static typing:
+
+- Better IDE support.
+
+- Better performance: no need to check types at run-time; more opportunities for compiler optimizations.
+
+- Some errors are caught early in the development process, potentially saving a lot of money.
+
+- Refactoring and maintaining code is easier.
+
+To simplify matters, dynamic languages seem to be better for quick, small projects, but do not scale as well to large, long-term projects.
+This is one of the reasons why gradual or optional typing is becoming fashionable: people want to use languages like JavaScript for more serious work but realize that it doesn't scale well without adhering to a static typing discipline.
+We will see below one attempt to do optional typing for JavaScript: TypeScript.
+
+
+### Duck Typing
 
 How does dynamic typing deal with objects? **Duck typing**.
 
@@ -144,6 +162,7 @@ console.log(p1.fullName());  // Hairy Porter
 Essentially, `new` first creates an empty object, and then calls the `Person` function with `this` pointing to the new object.
 Notice that the `Person` function does not return anything -- it is `new` that returns a reference to the new object and stores it in `p1`.
 
+
 ### Prototypes
 
 JS uses *prototypes* as a way to model inheritance and other relations between classes.
@@ -196,7 +215,6 @@ One can, for instance, model classes quite easily using prototypes, as we see be
 ### Inheritance
 
 The simplest way to implement inheritance in JS is to link the prototype of an object of the subtype to the object of a supertype.
-
 
 ```javascript
 var a = {
@@ -290,7 +308,73 @@ console.log(b.toString());  // b
 console.log(b.size);  // 12
 ```
 
-### Dynamic Dispatch
+Note that there is the inheritance hierarchy is not static in JS.
+In fact, in some implementations of JS, you can modify the prototype chain of an object on-the-fly!
+
+```javascript
+class A {
+  foo () { return "a"; }
+}
+
+class B extends A {}
+
+var b = new B();
+
+// Prototype chain:
+// b ---> B.prototype ---> A.prototype ---> Object.prototype ---> null
+
+console.log(b.foo());  // a
+
+class C {
+  foo () { return "c"; }
+}
+
+b.__proto__.__proto__ = C.prototype;  // Deprecated and not always supported - don't use!
+
+// Prototype chain:
+// b ---> B.prototype ---> C.prototype ---> Object.prototype ---> null
+
+console.log(b.foo());  // c
+```
+
+Another important thing to note is that you do not get the security properties provided to you by classes in an OOP language.
+Duck typing extends to methods (which are just functions) and which can be swapped out by different implementations on-the-fly during execution.
+In fact, you can even do this with prototype objects (which is a fun way of injecting malicious code into libraries).
+For example, suppose you have a common library that defines a class `A`:
+
+```javascript
+class A {
+  foo () { console.log("Do something benign and hopefully useful."); }
+}
+```
+
+And there is some application code which you want to hack:
+
+```javascript
+...
+var a = new A();
+a.foo();  // Do something benign and hopefully useful.
+...
+```
+
+And you (the evil hacker) manage to execute some code before the harmless application code runs:
+
+```javascript
+C.prototype.foo = function () { return "Do something harmful and malicious."; };
+```
+
+Then the application is now bent to your evil purpose:
+
+```javascript
+...
+var a = new A();
+a.foo();  // Do something harmful and malicious.
+...
+```
+
+### More about Methods
+
+Methods are nothing more than properties that hold function values.
 
 JavaScript, being dynamically typed, has no concept of method signatures.
 This means there is no method overloading; in fact, there can only be one function of a given name in an object.
@@ -475,7 +559,7 @@ class Person implements NamedVal {
 }
 ```
 
-### Union and Intersection types
+### Union types
 
 Suppose you have a function that expects either a number or a string:
 
@@ -509,7 +593,6 @@ function padLeft(value: string, padding: string | number) {
 
 let indentedString = padLeft("Hello world", true);  // Error
 ```
-
 
 ### Generics
 
@@ -566,13 +649,49 @@ loggingIdentity(3);  // Error, number doesn't have a .length property
 
 ### Unsoundness
 
+
+```typescript
+class Animal {
+   name: string;
+   constructor(name: string) {
+       this.name = name;
+   }
+}
+
+class Dog extends Animal {
+    bark() { console.log("woof"); }
+}
+
+class Cat extends Animal {
+    purr() { console.log("prrr"); }
+}
+
+let cats: Array<Cat> = []; // can only contain cats
+let animals: Array<Animal> = []; // can only contain animals
+
+// wow, works, but is no longer safe
+animals = cats;
+
+animals.push(new Dog('Brutus'));
+
+cats.forEach(cat => cat.purr());
+// Uncaught TypeError: cat.purr is not a function
+```
+
+
 ## Further Reading
+
+JavaScript:
+
+- [Eloquent JavaScript](https://eloquentjavascript.net/): a free online book
 
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/A_re-introduction_to_JavaScript
 
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain
 
 - [Try JavaScript in your browser](https://repl.it/repls/SweetExhaustedBinarytree)
+
+TypeScript:
 
 - [The TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/basic-types.html)
 
