@@ -720,6 +720,12 @@ loggingIdentity(3);  // Error, number doesn't have a .length property
 
 ### Unsoundness
 
+A type system is said to be *sound* if every program that has no type errors will not have any type-related errors (of certain kinds) during run-time.
+Unfortunately, TypeScript is unsound.
+There are programs that TypeScript allows without any type errors during compile-time, which throw type errors in run-time.
+This is intentional, for the TypeScript designers [chose](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Design-Goals) to prioritize productivity and a simpler type system over soundness.
+However, it is good to know the situations in which TypeScript is unsound.
+For example:
 
 ```typescript
 class Animal {
