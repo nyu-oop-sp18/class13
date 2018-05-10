@@ -39,7 +39,7 @@ console.log(person1.age);  // 999
 
 // Creating an empty object
 var person2 = {};
-console.log(person1.age);  // undefined
+console.log(person2.age);  // undefined
 ```
 
 
@@ -114,7 +114,7 @@ function dunk(a) {
   if (!a.canSwim)
     console.log("Whoops, this animal drowned!");
   else
-    duck.quack();
+    a.quack();
 }
 
 dunk(duck);  // Quack quack!
@@ -500,7 +500,7 @@ Since functions are also first-class objects, you can write (with a little bit o
 ```javascript
 function map(f, l) {
   for (var i = 0; i < l.length; i++)
-    l[i] = f.apply(null, [l[i]]);
+    l[i] = f([l[i]]);
 }
 
 function sq(x) { return x*x; }
@@ -773,5 +773,7 @@ JavaScript:
 TypeScript:
 
 - [The TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/basic-types.html)
+
+- [TypeScript Deep Dive](https://basarat.gitbooks.io/typescript/content/)
 
 - [Try TypeScript in your browser](https://www.typescriptlang.org/play/)
