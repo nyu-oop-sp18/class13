@@ -175,7 +175,7 @@ For example, if you create a new object
 var o = { foo: "123" };
 ```
 then JavaScript automatically sets the prototype of `o` to `Object.prototype`.
-What is the prototype of `Object.prototype`, you may ask? `null`.
+What is the prototype of `Object.prototype`, you ask? `null`.
 
 Every time we access a property of an object, `o.p`, JavaScript will first look for `p` in `o`, and failing that, will look in the prototype of `o`, and then the prototype of the prototype of `o`, and so on.
 This is called the *prototype chain*, and the search for `p` ends when the prototype of some object is `null`.
@@ -311,7 +311,7 @@ console.log(b.toString());  // b
 console.log(b.size);  // 12
 ```
 
-Note that there is the inheritance hierarchy is not static in JavaScript.
+Note that the inheritance hierarchy is not static in JavaScript.
 In fact, in some implementations of JavaScript, you can modify the prototype chain of an object on-the-fly!
 
 ```javascript
